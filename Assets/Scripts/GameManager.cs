@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
         {
             //만약에 저장된 씰포스 리스트가 있다면 그 문은 닫힌문!
             var sealPosList = MapManager.Instance.sealPosList;
-            
+
+            //MapManager.Instance.tileData[0][0];
             //아닐경우에
         }
     }
