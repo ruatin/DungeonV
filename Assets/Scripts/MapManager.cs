@@ -178,6 +178,8 @@ public class MapManager : MonoBehaviour
 
 
     }
+    
+    public List<Vector3Int> minePosList = new List<Vector3Int>();
 
     private void UpdateRoom()
     {
@@ -189,8 +191,11 @@ public class MapManager : MonoBehaviour
                 if (tileData[i][j] == 'm')
                 {
 //                    texts[i][j].text = "M";
-//                    landTileMap.SetTile(new Vector3Int(i-row/2,j-col/2,1),mineTile);
-                    buildingTileMap.SetTile(new Vector3Int(i-row/2,j-col/2,0),mineTile);
+                    landTileMap.SetTile(new Vector3Int(i-row/2,j-col/2,1),mineTile);
+
+                    var minePos = new Vector3Int(i - row / 2, j - col / 2, 0);
+                    minePosList.Add(minePos);
+                    buildingTileMap.SetTile(minePos,mineTile);
                 }
                 else if(tileData[i][j] > 0)
                 {
