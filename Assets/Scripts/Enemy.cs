@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     private PathFindingManager path;
     private Rigidbody2D rigid2D;
     public float maxSpeed = 2f;
+    public int damage = 5;
 
 
     public Vector2 nextPos;
@@ -27,12 +28,16 @@ public class Enemy : MonoBehaviour
         rigid2D = GetComponent<Rigidbody2D>();
         var pos = MapManager.Instance.ChangeCellPos(transform.position);
         startPos = new Vector2Int(pos.x,pos.y);
+
         
         StartCoroutine(PathFinding());
     }
 
     private void OnEnable()
     {
+        path.bottomLeft = new Vector2Int(-MapManager.Instance.col/2,-MapManager.Instance.row/2);
+        path.topRight = new Vector2Int(MapManager.Instance.col/2,MapManager.Instance.row/2);
+        
         MapManager.Instance.mapChangeEvent += MapChange;
         path.PathFinding(startPos,MapManager.Instance.heartRoomPos);
     }
@@ -40,11 +45,6 @@ public class Enemy : MonoBehaviour
     private void OnDisable()
     {
         MapManager.Instance.mapChangeEvent -= MapChange;
-    }
-
-    private void Start()
-    {
-        
     }
 
     // Update is called once per frame
@@ -67,8 +67,19 @@ public class Enemy : MonoBehaviour
         yield return null;
         path.PathFinding(startPos,MapManager.Instance.heartRoomPos);
     }
-    
-    
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Building"))
+        {
+            other.gameObject.GetComponent<Player>().Damaged(damage);
+        }
+    }
 
     private void FixedUpdate()
     {

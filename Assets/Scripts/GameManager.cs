@@ -10,13 +10,19 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        UiManager.Instance.SetEnemySpawnText((int)currentTime);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!MapManager.Instance.canOpen)
+        {
+            return;
+        }
         currentTime += Time.deltaTime;
+        UiManager.Instance.SetEnemySpawnText((int)openDoorTime - (int)currentTime);
+        
         if (currentTime >= openDoorTime)
         {
             currentTime -= openDoorTime;
@@ -29,18 +35,25 @@ public class GameManager : MonoBehaviour
             //오픈을하는데 봉인된 지뢰로 표시해서 오픈한다.
             //같지 않을 경우에 그냥 오픈한다.
 
-            var randomCount = Random.Range(0, minePosList.Count - 1);
+            var randomCount = Random.Range(0, minePosList.Count);
+            if (minePosList.Count <= 0)
+            {
+                return;
+            }
+            
             var pos = minePosList[randomCount];
 
             if (sealPosList.Count <= 0)
             {
                 //그냥 지뢰 오픈한다 openTheMine
                 Debug.Log("openTheMine");
+                MapManager.Instance.OpenTheMine(pos,randomCount);
                 return;
             }
             
             if (sealPosList.Contains(pos))
             {
+                Debug.Log(pos);
                 //오픈한다 봉인된 지뢰를 openTheSealMine
                 Debug.Log("openTheSealMine");
                 //오픈하면 마인 리스트에서 빼야한다.
@@ -49,6 +62,7 @@ public class GameManager : MonoBehaviour
             {
                 //그냥 지뢰 오픈한다 openTheMine
                 Debug.Log("openTheMine");
+                MapManager.Instance.OpenTheMine(pos,randomCount);
             }
             
 

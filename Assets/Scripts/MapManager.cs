@@ -31,12 +31,15 @@ public class MapManager : MonoBehaviour
     public Tilemap wallTileMap;
     public Tilemap landTileMap;
     public Tilemap buildingTileMap;
+    public Tilemap enemyBuildingTileMap;
     public Tilemap unBreakableTileMap;
     public TileBase brickTile;
     public TileBase unBreakableTile;
     public TileBase landTile;
     public TileBase mineTile;
     public TileBase goldTile;
+    public TileBase heartTile;
+    public TileBase trapTile;
     
     private Vector3 offsetTileAnchor;
     
@@ -44,7 +47,7 @@ public class MapManager : MonoBehaviour
     
     public int canStartCount = 1;
 
-    private bool canOpen;
+    public bool canOpen;
 
     public int DungeonPoint
     {
@@ -54,8 +57,6 @@ public class MapManager : MonoBehaviour
 
     private int dungeonPoint;
 
-    public Text pointText;
-    
     List<Vector3Int> openList = new List<Vector3Int>();
     List<Vector3Int> closeList = new List<Vector3Int>();
     List<Vector3Int> numList = new List<Vector3Int>();
@@ -69,6 +70,8 @@ public class MapManager : MonoBehaviour
     public GameObject enemy;
     
     public List<Vector3Int> sealPosList = new List<Vector3Int>();
+    
+    private Text startTileText;
 
     private void Awake()
     {
@@ -190,16 +193,12 @@ public class MapManager : MonoBehaviour
             {
                 if (tileData[i][j] == 'm')
                 {
-//                    texts[i][j].text = "M";
-                    landTileMap.SetTile(new Vector3Int(i-row/2,j-col/2,1),mineTile);
-
                     var minePos = new Vector3Int(i - row / 2, j - col / 2, 0);
                     minePosList.Add(minePos);
-                    buildingTileMap.SetTile(minePos,mineTile);
+                    enemyBuildingTileMap.SetTile(minePos,mineTile);
                 }
                 else if(tileData[i][j] > 0)
                 {
-//                    texts[i][j].text = tileData[i][j].ToString();
                     landTileMap.SetTile(new Vector3Int(i-row/2,j-col/2,0),goldTile);
                 }
             }
@@ -208,7 +207,7 @@ public class MapManager : MonoBehaviour
 
 
 
-    
+
     private void SelectHeartRoom()
     {
         var startPosList = new List<Vector3Int>();
@@ -227,8 +226,10 @@ public class MapManager : MonoBehaviour
         for (int i = 0; i < canStartCount; i++)
         {
             var randNum = Random.Range(0, startPosList.Count-1);
-            var startPos = startPosList[randNum];
-            var startTileText = Instantiate(numberText,startPos,quaternion.identity,textRoot.transform);
+            var startPos = startPosList[randNum] + new Vector3Int(0,0,0);
+            
+            buildingTileMap.SetTile(startPos,heartTile);
+            startTileText = Instantiate(numberText,startPos,quaternion.identity,textRoot.transform);
             startTileText.text = "!";
             
             startPointList.Add(startPos);
@@ -266,6 +267,7 @@ public class MapManager : MonoBehaviour
                 if (point == cellPos)
                 {
                     heartRoomPos = new Vector2Int(point.x,point.y);
+                    Destroy(startTileText.gameObject);
                     canOpen = true;
                     break;
                 }
@@ -288,8 +290,8 @@ public class MapManager : MonoBehaviour
         
         if(pickValue == 'm' && !isDead)
         {
-            Debug.Log("You Died");
-            StartCoroutine(SpawnEnemy(cellPos));
+            minePosList.Remove(cellPos);
+            Instantiate(enemy, cellPos+new Vector3(0.5f,0.5f,0), quaternion.identity);
         }
         else if (pickValue == 0)
         {
@@ -344,6 +346,9 @@ public class MapManager : MonoBehaviour
                 
                 var numTile = Instantiate(numberText,num,quaternion.identity,textRoot.transform);
                 numTile.text = tileData[x][y].ToString();
+                
+                dungeonPoint += tileData[x][y];
+                UiManager.Instance.SetPointText(dungeonPoint);
             }
             
         }
@@ -352,6 +357,9 @@ public class MapManager : MonoBehaviour
             Vector3 pos1 = new Vector3(x2-row/2,y2-col/2,0);
             var numTile = Instantiate(numberText,pos1,quaternion.identity,textRoot.transform);
             numTile.text = tileData[x2][y2].ToString();
+
+            dungeonPoint += tileData[x2][y2];
+            UiManager.Instance.SetPointText(dungeonPoint);
         }
 
         openList.Clear();
@@ -362,79 +370,20 @@ public class MapManager : MonoBehaviour
 //        MakeEmpty(pos);
     }
 
-    private IEnumerator SpawnEnemy(Vector3Int cellPos)
+    public void OpenTheMine(Vector3Int cellPos,int index)
     {
-        yield return null;
+        minePosList.RemoveAt(index);
+        wallTileMap.SetTile(cellPos,null);
+        mapChangeEvent?.Invoke();
         Instantiate(enemy, cellPos+new Vector3(0.5f,0.5f,0), quaternion.identity);
     }
 
-    public void MakeEmpty(Vector3 pos)
+    public void BuildTrap(Vector3 pos)
     {
         Vector3Int cellPos = wallTileMap.WorldToCell(pos + offsetTileAnchor);
-
-        foreach (var point in startPointList)
-        {
-            if (point == cellPos)
-            {
-                canOpen = true;
-                break;
-            }
-        }
-        
-        cellPos += new Vector3Int(0,0,2);
-        if (!wallTileMap.GetTile(cellPos) || !canOpen)
-        {
-            return;
-        }
-
-        wallTileMap.SetTile(cellPos,null);
-
-        var x = cellPos.x + row / 2;
-        var y= cellPos.y + col / 2;
-
-        if (tileData[x][y] == 'm' && !isDead)
-        {
-            Debug.Log("You Died");
-        }
-        else
-        {
-            FindEmptyRoom(x, y);
-
-        }
+        buildingTileMap.SetTile(cellPos,trapTile);
     }
 
-    private void FindEmptyRoom(int x, int y)
-    {
-        bool noMine = tileData[x][y] == 0;
-        
-        if (noMine)
-        {
-            tileData[x][y] = '0';
-
-            for (int i = x-1; i < x+2; i++)
-            {
-                for (int j = y-1; j < y+2; j++)
-                {
-                    if (i < 0 || j < 0  || i == tileData.Length || j == tileData[i].Length  || (i == x && j == y))
-                    {
-                        continue;
-                    }
-                    
-                    MakeEmpty(new Vector3(i - row / 2, j - col / 2, 0));
-                }
-            }
-        }
-        else
-        {
-            Vector3 pos = new Vector3(x-row/2,y-col/2,0);
-            var numTile = Instantiate(numberText,pos,quaternion.identity,textRoot.transform);
-            numTile.text = tileData[x][y].ToString();
-
-            dungeonPoint += tileData[x][y];
-            pointText.text = string.Format("Point : {0}",dungeonPoint );
-        }
-    }
-    
     private void Died()
     {
         isDead = true;

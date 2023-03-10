@@ -44,10 +44,8 @@ public class MouseInput : MonoBehaviour
             {
                 if (1 << col.gameObject.layer == landLayer)
                 {
-                    var pos = MapManager.Instance.ChangeCellPos(mousePosition);
-                    Vector2Int changePos = new Vector2Int(pos.x,pos.y);
-                    path.PathFinding(changePos,MapManager.Instance.heartRoomPos);
-                    break;
+                    MapManager.Instance.BuildTrap(mousePosition);
+                    return;
                 }
             }
         }
