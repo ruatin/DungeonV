@@ -47,15 +47,6 @@ public class Enemy : MonoBehaviour
         MapManager.Instance.mapChangeEvent -= MapChange;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetButtonUp("Horizontal"))
-        {
-            rigid2D.velocity = new Vector2(0,rigid2D.velocity.y);
-        }
-    }
-
     private void MapChange()
     {
         StartCoroutine(PathFinding());
@@ -66,11 +57,6 @@ public class Enemy : MonoBehaviour
         path.FinalNodeList.Clear();
         yield return null;
         path.PathFinding(startPos,MapManager.Instance.heartRoomPos);
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        
     }
 
     private void OnCollisionEnter2D(Collision2D other)
