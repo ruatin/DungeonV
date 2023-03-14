@@ -19,11 +19,11 @@
         <e p="Scripts" t="Include">
           <e p="Enemy.cs" t="Include" />
           <e p="GameManager.cs" t="Include" />
+          <e p="HeartRoom.cs" t="Include" />
           <e p="MapManager.cs" t="Include" />
           <e p="MouseInput.cs" t="Include" />
           <e p="Node.cs" t="Include" />
           <e p="PathFindingManager.cs" t="Include" />
-          <e p="Player.cs" t="Include" />
           <e p="TileData.cs" t="Include" />
           <e p="UiManager.cs" t="Include" />
         </e>

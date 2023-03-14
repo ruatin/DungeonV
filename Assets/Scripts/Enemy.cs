@@ -63,7 +63,15 @@ public class Enemy : MonoBehaviour
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Building"))
         {
-            other.gameObject.GetComponent<Player>().Damaged(damage);
+            other.gameObject.GetComponent<HeartRoom>().Damaged(damage);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.GetComponent<HeartRoom>())
+        {
+            other.gameObject.GetComponent<HeartRoom>().Damaged(damage);
         }
     }
 

@@ -40,6 +40,8 @@ public class MapManager : MonoBehaviour
     public TileBase goldTile;
     public TileBase heartTile;
     public TileBase trapTile;
+
+    public GameObject heartRoom;
     
     private Vector3 offsetTileAnchor;
     
@@ -228,7 +230,9 @@ public class MapManager : MonoBehaviour
             var randNum = Random.Range(0, startPosList.Count-1);
             var startPos = startPosList[randNum] + new Vector3Int(0,0,0);
             
-            buildingTileMap.SetTile(startPos,heartTile);
+//            buildingTileMap.SetTile(startPos,heartTile);
+            Instantiate(heartRoom, startPos + new Vector3(0.5f,0.5f,0), quaternion.identity, buildingTileMap.transform);
+            
             startTileText = Instantiate(numberText,startPos,quaternion.identity,textRoot.transform);
             startTileText.text = "!";
             

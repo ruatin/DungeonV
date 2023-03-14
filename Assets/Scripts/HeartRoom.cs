@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class HeartRoom : MonoBehaviour
 {
     public int playerCurrentHp;
     public int playerMaxHp = 50;
