@@ -62,16 +62,18 @@ public class Enemy : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Building"))
-        {
+        { 
             other.gameObject.GetComponent<HeartRoom>().Damaged(damage);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.GetComponent<HeartRoom>())
+        if (!other.CompareTag("Trap")) return;
+        
+        if (other.gameObject.GetComponent<Trap>().onAttack)
         {
-            other.gameObject.GetComponent<HeartRoom>().Damaged(damage);
+                
         }
     }
 
@@ -108,18 +110,11 @@ public class Enemy : MonoBehaviour
             }
             currentDest = new Vector2(finalNodeList[currentIndex].x + 0.5f, finalNodeList[currentIndex].y + 0.5f);
         }
-        
-//        
-//        float h = Input.GetAxisRaw("Horizontal");
-//        rigid2D.AddForce(Vector2.right * h,ForceMode2D.Impulse);
-//
-//        if (rigid2D.velocity.x > maxSpeed)
-//        {
-//            rigid2D.velocity = new Vector2(maxSpeed,rigid2D.velocity.y);
-//        }
-//        else if (rigid2D.velocity.x < -maxSpeed)
-//        {
-//            rigid2D.velocity = new Vector2(-maxSpeed,rigid2D.velocity.y);
-//        }
+    }
+
+    private float _enemyHp;
+    public void Damaged(float value)
+    {
+        _enemyHp -= value;
     }
 }

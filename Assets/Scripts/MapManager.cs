@@ -228,6 +228,11 @@ public class MapManager : MonoBehaviour
         for (int i = 0; i < canStartCount; i++)
         {
             var randNum = Random.Range(0, startPosList.Count-1);
+            if (startPosList.Count <= randNum)
+            {
+                Debug.Log(startPosList.Count +" .count " + randNum + " .randCount ");
+                randNum = startPosList.Count - 1;
+            }
             var startPos = startPosList[randNum] + new Vector3Int(0,0,0);
             
 //            buildingTileMap.SetTile(startPos,heartTile);
@@ -384,8 +389,9 @@ public class MapManager : MonoBehaviour
 
     public void BuildTrap(Vector3 pos)
     {
+        //Todo
         Vector3Int cellPos = wallTileMap.WorldToCell(pos + offsetTileAnchor);
-        buildingTileMap.SetTile(cellPos,trapTile);
+//        buildingTileMap.SetTile(cellPos,trapTile);
     }
 
     private void Died()
